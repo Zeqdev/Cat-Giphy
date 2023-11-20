@@ -1,35 +1,42 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react'
 
 function App() {
-  const [count, setCount] = useState(0)
+	const [catFact, setCatFact] = useState<string>('')
+	const [gif, setGif] = useState<string>('')
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+	const getGif = (string: string) => {
+		const giphy_API: string = 'https://api.giphy.com/v1/gifs/search?q='
+		const giphy_API_KEY: string = '&api_key=Je8I67Tj2pprYJ7OWB9ELIE8jFDvESPa'
+
+		const url: string = giphy_API + string + giphy_API_KEY
+
+		console.log(url)
+
+		fetch(url)
+			.then(response => response.json())
+			.then(data => setGif(data.data[0].images.original.url))
+	}
+
+	const getCatFact = () => {
+		const catFact_API: string = 'https://catfact.ninja/fact'
+
+		fetch(catFact_API)
+			.then(response => response.json())
+			.then(data => {
+				setCatFact(data.fact)
+
+				return getGif(data.fact.split(' ', 3).join(' '))
+			})
+	}
+
+	useEffect(getCatFact, [])
+
+	return (
+		<section className='App'>
+			<img src={gif} alt='Cat gif' />
+			<p>{catFact}</p>
+		</section>
+	)
 }
 
 export default App
